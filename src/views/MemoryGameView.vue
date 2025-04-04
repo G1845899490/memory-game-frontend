@@ -235,7 +235,6 @@ export default {
                 // 发送 POST 请求
                 const response = await this.$axios.post('/api/game/history', gameHistory, config);
 
-                // 处理响应
                 console.log('游戏历史保存成功:', response.data);
             } catch (error) {
                 console.error('保存游戏历史失败:', error);

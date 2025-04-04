@@ -4,10 +4,10 @@
 
     <div class="form-group">
       <label for="register-username">用户名：</label>
-      <input id="register-username" v-model="username" placeholder="请输入用户名" @input="checkUsername" />
-      <span v-if="usernameChecking" class="status-text checking">检查中...</span>
-      <span v-else-if="usernameExists" class="status-text error">用户名已存在</span>
-      <span v-else-if="usernameChecked && !usernameExists" class="status-text success">用户名可用</span>
+      <input id="register-username" v-model="username" placeholder="请输入用户名" @input="checkUsername" />&nbsp;
+      <span v-if="usernameChecking" class="status-text checking">检查中..</span>
+      <span v-else-if="usernameExists" class="status-text error">已存在</span>
+      <span v-else-if="usernameChecked && !usernameExists" class="status-text success">可用</span>
     </div>
 
     <div class="form-group">
@@ -21,7 +21,8 @@
     </div>
 
     <div class="button-group">
-      <button @click="register">注册</button>
+      <button @click="register" :disabled="!username || !password || usernameChecking || (usernameChecked && !usernameExists)"
+      :class="{ 'disabled-button': !username || !password || usernameChecking ||(usernameChecked && usernameExists) }">注册</button>
       <button @click="$router.push('/login')">去登录</button>
     </div>
   </div>
@@ -83,7 +84,7 @@ export default {
         alert('注册成功，请登录');
         this.$router.push('/login');
       } catch (error) {
-        alert('注册失败：' + (error.response?.data || error.message));
+        console.log("注册失败");
       }
     }
   }
@@ -124,11 +125,12 @@ export default {
 }
 
 .form-group input {
-  flex-grow: 1;
+  /* flex-grow: 1; */
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
+  width: 60%;
 }
 
 
@@ -176,5 +178,15 @@ export default {
 .button-group button:active {
   transform: scale(0.98);
   /* 点击效果 */
+}
+
+.button-group button.disabled-button {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+}
+
+.button-group button.disabled-button:hover {
+  background-color: #cccccc;
 }
 </style>
