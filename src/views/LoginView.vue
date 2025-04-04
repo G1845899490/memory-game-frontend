@@ -4,22 +4,21 @@
 
     <div class="form-group">
       <label for="username">用户名：</label>
-      <input id="username" v-model="username" placeholder="用户名" @input="checkUsername" />
-      <span v-if="usernameChecking" class="status-text checking">检查中...</span>
-      <span v-else-if="usernameExists" class="status-text error">用户名可用</span>
-      <span v-else-if="usernameChecked && !usernameExists" class="status-text success">用户名不存在</span>
+      <input id="username" v-model="username" placeholder="用户名" @input="checkUsername" />&nbsp;
+      <span v-if="usernameChecking" class="status-text checking">检查中..</span>
+      <span v-else-if="usernameExists" class="status-text error">可用</span>
+      <span v-else-if="usernameChecked && !usernameExists" class="status-text success">不存在</span>
     </div>
 
     <div class="form-group">
       <label for="password">密码：</label>
-      <input id="password" v-model="password" type="password" placeholder="密码" @input="passwordWrong = false" />
-      <span v-if="passwordWrong" class="status-text password wrong">密码错误</span>
-
+      <input id="password" v-model="password" type="password" placeholder="密码" @input="passwordWrong = false" />&nbsp;
+      <span v-if="passwordWrong" class="status-text password wrong">有误</span>
     </div>
 
     <div class="button-group">
-      <button @click="login" :disabled="!username || !password || (usernameChecked && !usernameExists)"
-        :class="{ 'disabled-button': !username || !password || (usernameChecked && !usernameExists) }">登录</button>
+      <button @click="login" :disabled="!username || !password || usernameChecking || (usernameChecked && !usernameExists)"
+        :class="{ 'disabled-button': !username || !password || usernameChecking || (usernameChecked && !usernameExists) }">登录</button>
       <button @click="$router.push('/register')">注册</button>
     </div>
   </div>
@@ -142,7 +141,7 @@ export default {
 }
 
 .form-group input {
-  flex-grow: 1;
+  /* flex-grow: 1; */
   /* 输入框占据剩余空间 */
   padding: 10px;
   border: 1px solid #ccc;
