@@ -41,23 +41,24 @@
     <table>
       <thead>
         <tr>
-          <th>序号</th>
+          <!-- <th>序号</th>
           <th>游戏类型</th>
           <th>是否成功</th>
           <th>得分</th>
           <th>翻牌次数</th>
           <th>回忆时间(秒)</th>
-          <th>日期</th>
+          <th>日期</th> -->
+          <th v-for="(header, index) in dynamicHeaders" :key="index">{{ header }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(record, index) in paginatedHistory" :key="record.id">
           <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
           <td>{{ record.gameType }}</td>
-          <td>{{ getGameData(record.gameData).success }}</td>
+          <td>{{ getGameData(record.gameData).prop1 }}</td>
           <td>{{ record.score }}</td>
-          <td>{{ getGameData(record.gameData).reverseCount }}</td>
-          <td>{{ getGameData(record.gameData).recallTime }}</td>
+          <td>{{ getGameData(record.gameData).prop2 }}</td>
+          <td>{{ getGameData(record.gameData).prop3 }}</td>
           <td>{{ formatDate(record.playedAt) }}</td>
         </tr>
       </tbody>
@@ -95,11 +96,30 @@ export default {
       selectSuccess: -1,
       sortField: 'playedAt',
       sortOrder: 'desc',
-      gameTypes: ['MemoryGame'] // 可以根据实际游戏类型扩展
+      gameTypes: ['DiscoverNewLocation', 'DiscoverNewContent', 'RecallOldLocation', 'RecallOldContent'],
     };
   },
 
   computed: {
+    // 动态表头
+    dynamicHeaders() {
+      if (!this.selectedGameType) {
+        return ['序号', '游戏类型', '是否成功', '得分', '参数1', '参数2', '日期'];
+      }
+      switch (this.selectedGameType) {
+        case 'RecallOldLocation':
+          return ['序号', '游戏类型', '是否成功', '得分', '翻牌次数', '回忆时间(秒)', '日期'];
+        case 'RecallOldContent':
+          return ['序号', '游戏类型', '是否成功', '得分', '游戏级别', '数字串长度', '日期'];
+        case 'DiscoverNewLocation':
+          return ['序号', '游戏类型', '是否成功', '得分', '找到数量', '矩阵尺寸', '日期'];
+        case 'DiscoverNewContent':
+          return ['序号', '游戏类型', '是否成功', '得分', '记忆时间', '回忆时间', '日期'];
+        default:
+          return ['序号', '游戏类型', '是否成功', '得分', '参数1', '参数2', '日期'];
+      }
+    },
+    
     // 筛选游戏类型
     filteredHistory1() {
       let result = [];
@@ -140,12 +160,12 @@ export default {
           aValue = new Date(a.playedAt).getTime();
           bValue = new Date(b.playedAt).getTime();
         } else {
-          // 处理需要从 gameData 中获取的字段
-          const aData = this.getGameData(a.gameData);
-          const bData = this.getGameData(b.gameData);
-          // obj[field]：访问对象属性值
-          aValue = aData[this.sortField];
-          bValue = bData[this.sortField];
+          // // 处理需要从 gameData 中获取的字段
+          // const aData = this.getGameData(a.gameData);
+          // const bData = this.getGameData(b.gameData);
+          // // obj[field]：访问对象属性值
+          // aValue = aData[this.sortField];
+          // bValue = bData[this.sortField];
         }
         // 排序
         return this.sortOrder === 'asc'
@@ -159,6 +179,7 @@ export default {
     paginatedHistory() {
       const start = (this.currentPage - 1) * this.pageSize;
       const end = start + this.pageSize;
+
       return this.filteredAndSortedHistory.slice(start, end);
     },
 
@@ -171,11 +192,35 @@ export default {
   methods: {
     getGameData(gameData) {
       try {
+        // 字符串转对象（data是一个数组对象，又是一个对象数组）
         const data = JSON.parse(gameData);
+        // console.log("data:", data);
+        
+        let key1, key2, key3, val1, val2, val3;
+
+        // 从 data 数组中提取属性名和值
+        if (Array.isArray(data) && data.length >= 3) {
+          // 提取第一个对象的属性名和值
+          key1 = Object.keys(data[0])[0]; 
+          val1 = Number(data[0][key1]); 
+
+          // 提取第二个对象的属性名和值
+          key2 = Object.keys(data[1])[0]; 
+          val2 = Number(data[1][key2]); 
+
+          // 提取第三个对象的属性名和值
+          key3 = Object.keys(data[2])[0]; 
+          val3 = Number(data[2][key3]);  
+        }
+
+        // 打印验证
+        // console.log("Keys:", key1, key2, key3); // "success", "reverseCount", "recallTime"
+        // console.log("Values:", val1, val2, val3); // 1, 5, 10
+
         return {
-          success: data[0]?.success === 1 ? "成功" : "失败",
-          reverseCount: data[1]?.reverseCount ?? 0,
-          recallTime: data[2]?.recallTime ?? 0
+          prop1: val1 === 1 ? "成功" : "失败",
+          prop2: val2,
+          prop3: val3
         };
       } catch (error) {
         console.error('解析游戏数据失败:', error);
@@ -186,18 +231,24 @@ export default {
         };
       }
     },
+
     formatDate(playedAt) {
       // 将 UTC 时间转换为 Asia/Shanghai 时间
       return dayjs.utc(playedAt).tz('Asia/Shanghai').format('YYYY/MM/DD HH:mm:ss');
     }
   },
+
   async created() {
     try {
       const response = await this.$axios.get('/api/game/history', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
+      console.log("response.data:", response.data);
+
       this.history = response.data;
-      // console.log(this.history);
+
+      // console.log(this.history[0]);
+      // console.log(this.history[0].gameData);
     } catch (error) {
       alert('获取历史记录失败：' + (error.response?.data || error.message));
     }
