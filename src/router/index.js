@@ -1,11 +1,14 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import MemoryGameView from '@/views/MemoryGameView.vue'
 import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import HistoryView from '@/views/HistoryView.vue'
 import ChangePasswordView from '@/views/ChangePasswordView.vue'
+import RecallOldLocationView from '@/views/gameviews/RecallOldLocationView.vue'
+import RecallOldContentView from '@/views/gameviews/RecallOldContentView.vue'
+import DiscoverNewLocationView from '@/views/gameviews/DiscoverNewLocationView.vue'
+import DiscoverNewContentView from '@/views/gameviews/DiscoverNewContentView.vue'
 
 
 Vue.use(VueRouter)
@@ -31,9 +34,26 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/memory',
-    name: 'memory',
-    component: MemoryGameView,
+    path: '/recalllocation',
+    name: 'recalllocation',
+    component: RecallOldLocationView,
+    props: route => ({ size: Number(route.query.size) })
+  },
+  {
+    path: '/recallcontent',
+    name: 'recallcontent',
+    component: RecallOldContentView
+  },
+  {
+    path: '/discoverlocation',
+    name: 'discoverlocation',
+    component: DiscoverNewLocationView,
+    props: route => ({ size: Number(route.query.size) })
+  },
+  {
+    path: '/discovercontent',
+    name: 'discovercontent',
+    component: DiscoverNewContentView,
     props: route => ({ size: Number(route.query.size) })
   },
   {
@@ -63,10 +83,10 @@ router.beforeEach((to, from, next) => {
   // 检查目标路由是否在白名单中
   const isPublicRoute = publicRoutes.includes(to.path) || to.path === '/'
 
-  // 假设有一个方法检查用户是否登录（这里用本地存储模拟）
+  // 检查用户是否登录（这里用本地存储模拟）
   const isLoggedIn = !!localStorage.getItem('token') // 示例：登录后存储 token
 
-  if (to.path === '/memory' && isLoggedIn) {
+  if (to.path === '/recalllocation' && isLoggedIn) {
     // 如果是内存游戏路由且已登录，检查是否有 size 参数
     const size = Number(to.query.size)
     if (isNaN(size) || size <= 0) {

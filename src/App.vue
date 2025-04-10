@@ -5,12 +5,10 @@
 </template>
 
 <script>
-import MemoryGameView from "./views/MemoryGameView.vue";
 
 export default {
   name: "App",
   components: {
-    MemoryGameView
   },
 };
 </script>

@@ -1,5 +1,5 @@
 <template>
-    <div class="memory-game">
+    <div class="recall-old-location">
         <!--倒计时区-->
         <div id="countDownBanner">
             <h2 v-bind:style="{ visibility: isCountingDown ? 'visible' : 'hidden' }">剩余时间：{{ memoryCountDown }}秒</h2>
@@ -41,7 +41,7 @@
 
 <script>
 export default {
-    name: 'MemoryGameView',
+    name: 'RecallOldLocationView',
     props: {
         size: {
             type: Number,
@@ -220,7 +220,7 @@ export default {
                 // 构造游戏历史数据
                 var result = Math.round(success * (1 / reverseCount) * (1 / (recallTime + 1)) * 25 * this.size);
                 const gameHistory = {
-                    gameType: 'MemoryGame',
+                    gameType: 'RecallOldLocation',
                     score: result,
                     gameData: JSON.stringify([{'success': Number(success)}, {'reverseCount': Number(reverseCount)}, {'recallTime': Number(recallTime)}]),
                     playedAt: new Date().toISOString()

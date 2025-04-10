@@ -1,17 +1,43 @@
 <template>
   <div class="home">
     <h1></h1>
-    <img alt="Vue logo" src="../assets/logo.png">
+    <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
     <br>
     <h1>欢迎来到记忆力训练游戏</h1>
     <br>
-    <h3>请选择游戏难度</h3>
+    <h3>翻牌记忆游戏</h3>
     <div class="difficulty-options">
-      <button @click="setSize(4)">2×2</button>
-      <button @click="setSize(6)">2×3</button>
-      <button @click="setSize(9)">3×3</button>
-      <button @click="setSize(12)">3×4</button>
-      <button @click="setSize(16)">4×4</button>
+      <button @click="playRecallOldLocationGame(4)">2×2</button>
+      <button @click="playRecallOldLocationGame(6)">2×3</button>
+      <button @click="playRecallOldLocationGame(9)">3×3</button>
+      <button @click="playRecallOldLocationGame(12)">3×4</button>
+      <button @click="playRecallOldLocationGame(16)">4×4</button>
+    </div>
+    <br>
+    <h3>数字串记忆游戏</h3>
+    <div class="difficulty-options">
+      <button @click="playRecallOldContentGame">开始游戏</button>
+      <!-- 选择初始长度 -->
+    </div>
+    <br>
+    <h3>扑克牌闪记游戏</h3>
+    <div class="difficulty-options">
+      <button @click="playDiscoverNewLocationGame(5)">5×4</button>
+      <button @click="playDiscoverNewLocationGame(6)">6×5</button>
+      <button @click="playDiscoverNewLocationGame(7)">7×6</button>
+      <button @click="playDiscoverNewLocationGame(8)">8×6</button>
+      <button @click="playDiscoverNewLocationGame(9)">9×6</button>
+      <!-- 选择初始矩阵大小 -->
+    </div>
+    <br>
+    <h3>发现新图片游戏</h3>
+    <div class="difficulty-options">
+      <button @click="playDiscoverNewContentGame(4)">2×2</button>
+      <button @click="playDiscoverNewContentGame(6)">2×3</button>
+      <button @click="playDiscoverNewContentGame(9)">3×3</button>
+      <button @click="playDiscoverNewContentGame(12)">3×4</button>
+      <button @click="playDiscoverNewContentGame(16)">4×4</button>
+      <button @click="playDiscoverNewContentGame(20)">5×4</button>
     </div>
     <br>
     <!-- 添加用户管理区域 -->
@@ -28,10 +54,26 @@
 export default {
   name: 'HomeView',
   methods: {
-    setSize(size) {
+    playRecallOldLocationGame(size) {
       // 通过路由跳转到 MemoryView，并传递 size 参数
       this.$router.push({
-        path: '/memory',
+        path: '/recalllocation',
+        query: { size: size } // 使用 query 参数传递 size
+      });
+    },
+    playRecallOldContentGame() {
+      this.$router.push('/recallcontent');
+    },
+    playDiscoverNewLocationGame(size) {
+      this.$router.push({
+        path: '/discoverlocation',
+        query: { size: size } 
+      });
+    },
+    playDiscoverNewContentGame(size) {
+      // 通过路由跳转到 MemoryView，并传递 size 参数
+      this.$router.push({
+        path: '/discovercontent',
         query: { size: size } // 使用 query 参数传递 size
       });
     },
