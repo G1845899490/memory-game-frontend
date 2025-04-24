@@ -9,7 +9,6 @@
         {{ $nbsp }}
         <span>当前{{ score }}分</span>
         {{ $nbsp }}
-        <button @click="$router.push('/home')" class="back-button">返回首页</button>
       </h2>
 
       <h2 v-if="isEnding">
@@ -27,7 +26,7 @@
           <div class="loader"></div> <!-- 转圈加载动画 -->
         </div>
 
-        <div class="card" v-for="(card, index) in matrix" :key="index" v-on:click="checkClick(index)">
+        <div class="card" v-for="(card, index) in dynaMatrix" :key="index" v-on:click="checkClick(index)">
           <div v-bind:style="{ visibility: matrix[index].isFront ? 'visible' : 'hidden' }">
             <img :src="matrix[index].card.image" alt="poker card" class="card-image">
           </div>
@@ -39,6 +38,7 @@
     <div class="game-stage">
       <button @click="startGame" class="start-button" v-bind:disabled="!isPreStarting">开始游戏</button>
       <button @click="initGame" class="play-again-button">再玩一局</button>
+      <button v-on:click="nextLevel">下一难度</button>
       <button @click="$router.push('/home')" class="back-button">返回首页</button>
     </div>
   </div>
@@ -143,6 +143,14 @@ export default {
   computed: {
     gridColumns() {
       return `repeat(${this.size}, 80px)`; // 列数和列宽
+    },
+
+    dynaMatrix() {
+      this.matrix = Array.from({ length: this.size * ((this.size - 1) >= 6 ? 6 : (this.size - 1)) }, () => ({
+        card: this.cards[Math.floor(Math.random() * this.cards.length)],
+        isFront: false
+      }));
+      return this.matrix;
     }
   },
 
@@ -291,6 +299,22 @@ export default {
       } catch (error) {
         console.error('保存游戏历史失败:', error);
       }
+    },
+
+    nextLevel() {
+      this.initGame();
+
+      if (this.size === 9) {
+        alert("已经是最高难度了，不能再升级了！");
+        return;
+      }
+
+      this.$router.push({
+        path: '/discoverLocation',
+        query: {
+          size: this.size + 1
+        }
+      })
     }
   }
 };
@@ -301,7 +325,8 @@ export default {
   display: grid;
   justify-content: center;
   gap: 10px;
-  position: relative; /* 确保遮罩的 absolute 定位相对于此容器 */
+  position: relative;
+  /* 确保遮罩的 absolute 定位相对于此容器 */
 }
 
 .card {
@@ -331,34 +356,46 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #000000; /* 不透明黑色遮罩 */
-  z-index: 10; /* 确保遮罩在卡牌上方 */
+  background-color: #000000;
+  /* 不透明黑色遮罩 */
+  z-index: 10;
+  /* 确保遮罩在卡牌上方 */
   display: flex;
   justify-content: center;
-  align-items: center; /* 居中加载动画 */
-  animation: fadeOut 1.0s ease forwards; /* 淡出动画 */
+  align-items: center;
+  /* 居中加载动画 */
+  animation: fadeOut 1.0s ease forwards;
+  /* 淡出动画 */
 }
 
 /* 转圈加载动画 */
 .loader {
   width: 40px;
   height: 40px;
-  border: 5px solid #ffffff; /* 白色边框 */
-  border-top: 5px solid #3498db; /* 蓝色顶部边框，突出旋转效果 */
+  border: 5px solid #ffffff;
+  /* 白色边框 */
+  border-top: 5px solid #3498db;
+  /* 蓝色顶部边框，突出旋转效果 */
   border-radius: 50%;
-  animation: spin 1s linear infinite; /* 持续旋转 */
+  animation: spin 1s linear infinite;
+  /* 持续旋转 */
 }
 
 /* 淡出动画 */
 @keyframes fadeOut {
   0% {
-    opacity: 1; /* 开始时完全不透明 */
+    opacity: 1;
+    /* 开始时完全不透明 */
   }
+
   80% {
-    opacity: 1; /* 前 80% 时间（1.2s）保持不透明 */
+    opacity: 1;
+    /* 前 80% 时间（1.2s）保持不透明 */
   }
+
   100% {
-    opacity: 0; /* 最后 20% 时间（0.3s）快速淡出 */
+    opacity: 0;
+    /* 最后 20% 时间（0.3s）快速淡出 */
   }
 }
 
@@ -367,6 +404,7 @@ export default {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }

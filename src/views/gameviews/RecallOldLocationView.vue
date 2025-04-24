@@ -14,7 +14,7 @@
         <!-- gridColumns返回网格的列数和列宽 -->
         <div id="cardsArea" v-bind:style="{ 'grid-template-columns': gridColumns }">
             <!-- :key="index"：为每个卡牌 <div> 绑定一个唯一的 key，这里使用 index（从 0 到 size-1） -->
-            <div class="card" v-for="(card, index) in cards.slice(0, size)" :key="index"
+            <div class="card" v-for="(card, index) in cards.slice(0, dynaSize)" :key="index"
                 v-on:click="handleCardClick(index)">
                 <div v-bind:style="{ visibility: cards[index].isFront ? 'visible' : 'hidden' }">
                     {{ card.content }}
@@ -31,9 +31,9 @@
             </button>
             <button v-bind:disabled="!isEnding" v-on:click="initGame">再玩一局
             </button>
-            <button v-on:click="goHome">回到首页
+            <button v-bind:disabled="isRecalling || isCountingDown" v-on:click="nextLevel">下一难度
             </button>
-            <button v-on:click="goGetHistory">游戏历史
+            <button v-on:click="goHome">回到首页
             </button>
         </div>
     </div>
@@ -43,7 +43,7 @@
 export default {
     name: 'RecallOldLocationView',
     props: {
-        size: {
+        level: {
             type: Number,
             required: true,
             validator: value => Number.isInteger(value) && value > 0 // 确保是正整数
@@ -53,7 +53,7 @@ export default {
         return {
             // data 中的this 并不指向 Vue 实例本身，而是指向当前 data 对象。直接调用 methods 中的方法（如 this.generateRandomContents）会导致错误
             // 所以可以先将data内属性初始化为null或''，在合适的地方再赋值
-            // size: null, // 记忆数量
+            size: 0, // 记忆数量
             memoryCountDown: null, // 记忆倒计时秒数
             recallCountDown: null, // 回想倒计时秒数
             recallTime: null, // 回想时间统计
@@ -71,16 +71,27 @@ export default {
 
     computed: {
         gridColumns() {
-            // 根据 size 的值动态返回列数和列宽
-            if (this.size === 4) return "repeat(2, max-content)";
-            if (this.size === 6) return "repeat(3, max-content)";
-            if (this.size === 9) return "repeat(3, max-content)";
-            if (this.size === 12) return "repeat(4, max-content)";
-            if (this.size === 16) return "repeat(4, max-content)";
+            // 根据 level 的值确定size的值，并动态返回列数和列宽,
+            if (this.level === 1) return "repeat(2, max-content)";
+            if (this.level === 2) return "repeat(3, max-content)";
+            if (this.level === 3) return "repeat(3, max-content)";
+            if (this.level === 4) return "repeat(4, max-content)";
+            if (this.level === 5) return "repeat(4, max-content)";
+        },
+
+        dynaSize() {
+            console.log("level: " + this.level); 
+            if (this.level === 1) this.size = 4;
+            if (this.level === 2) this.size = 6;
+            if (this.level === 3) this.size = 9;
+            if (this.level === 4) this.size = 12;
+            if (this.level === 5) this.size = 16;
+            return this.size;
         }
     },
 
     created() {
+        console.log("created()执行了");
         this.initGame();
     },
 
@@ -92,7 +103,15 @@ export default {
                 clearInterval(this.countDownTimer);
                 this.countDownTimer = null;
             }
-            // this.size = 16;
+
+            // console.log("level: " + this.level); 
+            
+            // if (this.level === 1) this.size = 4;
+            // if (this.level === 2) this.size = 6;
+            // if (this.level === 3) this.size = 9;
+            // if (this.level === 4) this.size = 12;
+            // if (this.level === 5) this.size = 16;
+
             this.memoryCountDown = 2;
             this.recallCountDown = 2;
             this.recallTime = 0;
@@ -222,7 +241,7 @@ export default {
                 const gameHistory = {
                     gameType: 'RecallOldLocation',
                     score: result,
-                    gameData: JSON.stringify([{'success': Number(success)}, {'reverseCount': Number(reverseCount)}, {'recallTime': Number(recallTime)}]),
+                    gameData: JSON.stringify([{ 'success': Number(success) }, { 'reverseCount': Number(reverseCount) }, { 'recallTime': Number(recallTime) }]),
                     playedAt: new Date().toISOString()
                 };
 
@@ -242,15 +261,23 @@ export default {
             }
         },
 
-        goGetHistory() {
+        nextLevel() {
             this.initGame();
-            this.isPreStarting = false;
+            // this.isPreStarting = false;
+
+            if (this.level === 5) {
+                alert("已经是最高难度了，不能再升级了！");
+                return;
+            }
+
             this.$router.push({
-                path: '/history'
+                path: '/recalllocation',
+                query: {
+                    level: this.level + 1
+                }
             })
         }
     }
-
 }
 </script>
 

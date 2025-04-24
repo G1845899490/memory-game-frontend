@@ -13,9 +13,10 @@
         </select>
       </div>
 
+      <!-- <select> 元素会将 value 作为字符串传递，因此 v-model="selectSuccess" 的值可能是 "-1"、"0" 或 "1"。 -->
       <div class="filter-group2">
         <label>是否成功：</label>
-        <select v-model="selectSuccess">
+        <select v-model.number="selectSuccess">
           <option value="-1">全部</option>
           <option value="0">失败</option>
           <option value="1">成功</option>
@@ -41,13 +42,6 @@
     <table>
       <thead>
         <tr>
-          <!-- <th>序号</th>
-          <th>游戏类型</th>
-          <th>是否成功</th>
-          <th>得分</th>
-          <th>翻牌次数</th>
-          <th>回忆时间(秒)</th>
-          <th>日期</th> -->
           <th v-for="(header, index) in dynamicHeaders" :key="index">{{ header }}</th>
         </tr>
       </thead>
@@ -119,7 +113,7 @@ export default {
           return ['序号', '游戏类型', '是否成功', '得分', '参数1', '参数2', '日期'];
       }
     },
-    
+
     // 筛选游戏类型
     filteredHistory1() {
       let result = [];
@@ -137,21 +131,28 @@ export default {
     filteredHistory2() {
       let result = [...this.filteredHistory1];
       if (this.selectSuccess === -1) {
-      } else {
+        console.log("selectSuccess -1", this.selectSuccess);
+        console.log("filteredHistory2", result);
+        return result;
+      }
+      if (this.selectSuccess !== -1) {
         console.log("selectSuccess0/1", this.selectSuccess);
         result = result.filter(record => {
           const gameData = JSON.parse(record.gameData);
           return Number(gameData[0].success) === Number(this.selectSuccess);
         });
+        console.log("filteredHistory2", result);
+        return result;
       }
-      return result;
+
     },
 
-    // 筛选完成后排序
+    // 筛选完成后按选择过滤并排序
     filteredAndSortedHistory() {
       let result = [...this.filteredHistory2];
       result.sort((a, b) => {
         // 集合中两个元素（a 和 b）如何比较并排序
+        // 过滤条件
         let aValue, bValue;
         if (this.sortField === 'score') {
           aValue = a.score;
@@ -172,6 +173,7 @@ export default {
           ? aValue - bValue
           : bValue - aValue;
       });
+      console.log("filteredAndSortedHistory", result);
       return result;
     },
 
@@ -180,12 +182,42 @@ export default {
       const start = (this.currentPage - 1) * this.pageSize;
       const end = start + this.pageSize;
 
-      return this.filteredAndSortedHistory.slice(start, end);
+      let result = this.filteredAndSortedHistory.slice(start, end);
+
+      console.log("paginatedHistory", result);
+      return result;
     },
 
     // 总页总数
     totalPages() {
       return Math.ceil(this.filteredAndSortedHistory.length / this.pageSize);
+    }
+  },
+
+  watch: {
+    // 监听游戏类型筛选
+    selectedGameType(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.currentPage = 1; // 重置到第1页
+      }
+    },
+    // 监听成功状态筛选
+    selectSuccess(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.currentPage = 1; // 重置到第1页
+      }
+    },
+    // 监听排序字段
+    sortField(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.currentPage = 1; // 重置到第1页
+      }
+    },
+    // 监听排序顺序
+    sortOrder(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.currentPage = 1; // 重置到第1页
+      }
     }
   },
 
@@ -195,22 +227,22 @@ export default {
         // 字符串转对象（data是一个数组对象，又是一个对象数组）
         const data = JSON.parse(gameData);
         // console.log("data:", data);
-        
+
         let key1, key2, key3, val1, val2, val3;
 
         // 从 data 数组中提取属性名和值
         if (Array.isArray(data) && data.length >= 3) {
           // 提取第一个对象的属性名和值
-          key1 = Object.keys(data[0])[0]; 
-          val1 = Number(data[0][key1]); 
+          key1 = Object.keys(data[0])[0];
+          val1 = Number(data[0][key1]);
 
           // 提取第二个对象的属性名和值
-          key2 = Object.keys(data[1])[0]; 
-          val2 = Number(data[1][key2]); 
+          key2 = Object.keys(data[1])[0];
+          val2 = Number(data[1][key2]);
 
           // 提取第三个对象的属性名和值
-          key3 = Object.keys(data[2])[0]; 
-          val3 = Number(data[2][key3]);  
+          key3 = Object.keys(data[2])[0];
+          val3 = Number(data[2][key3]);
         }
 
         // 打印验证
