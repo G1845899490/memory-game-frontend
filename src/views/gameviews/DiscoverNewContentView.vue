@@ -13,7 +13,7 @@
 
         <!--卡牌区-->
         <div class="cardsArea" v-bind:style="{ 'grid-template-columns': gridColumns }">
-            <div class="card" v-for="(card, index) in cards.slice(0, size)" :key="index" :class="{
+            <div class="card" v-for="(card, index) in cards.slice(0, dynaSize)" :key="index" :class="{
                 'right': index === randomIndex && isEnding,
                 'wrong': index === clickedIndex && index !== randomIndex && isEnding,
             }" v-on:click="handleCardClick(index)">
@@ -34,6 +34,9 @@
             <button v-on:click="resetGame">
                 重开一局
             </button>
+            <button v-on:click="nextLevel">
+                下一难度
+            </button>
             <button v-on:click="goHome">
                 回到首页
             </button>
@@ -47,7 +50,7 @@ export default {
     name: 'DiscoverNewContentView',
 
     props: {
-        size: {
+        level: {
             type: Number,
             required: true,
             validator: value => Number.isInteger(value) && value > 0 // 确保是正整数
@@ -81,13 +84,28 @@ export default {
 
     computed: {
         gridColumns() {
+            console.log("gridColumns()执行了");
+
+            console.log("this.level: " + this.level);
+
+
             // 根据 size 的值动态返回列数和列宽
-            if (this.size === 4) return "repeat(2, max-content)";
-            if (this.size === 6) return "repeat(3, max-content)";
-            if (this.size === 9) return "repeat(3, max-content)";
-            if (this.size === 12) return "repeat(4, max-content)";
-            if (this.size === 16) return "repeat(4, max-content)";
-            if (this.size === 20) return "repeat(5, max-content)";
+            if (this.level === 1) return "repeat(2, max-content)";
+            if (this.level === 2) return "repeat(3, max-content)";
+            if (this.level === 3) return "repeat(3, max-content)";
+            if (this.level === 4) return "repeat(4, max-content)";
+            if (this.level === 5) return "repeat(4, max-content)";
+            if (this.level === 6) return "repeat(5, max-content)";
+        },
+
+        dynaSize() {
+            if (this.level === 1) this.size = 4;
+            if (this.level === 2) this.size = 6;
+            if (this.level === 3) this.size = 9;
+            if (this.level === 4) this.size = 12;
+            if (this.level === 5) this.size = 16;
+            if (this.level === 6) this.size = 20;
+            return this.size;
         }
     },
 
@@ -137,10 +155,10 @@ export default {
             this.isMemorizing = false;
             this.isRecalling = true;
 
-            this.randomCards = this.cards.slice(0, this.size).sort(() => Math.random() - 0.5);
-            this.randomIndex = Math.floor(Math.random() * this.size);
+            this.randomCards = this.cards.slice(0, this.dynaSize).sort(() => Math.random() - 0.5);
+            this.randomIndex = Math.floor(Math.random() * this.dynaSize);
             console.log("randomIndex: " + this.randomIndex); // 暴露答案
-            let temp = this.cards[this.size];
+            let temp = this.cards[this.dynaSize];
             this.randomCards[this.randomIndex] = temp;
             this.cards = this.randomCards;
 
@@ -205,7 +223,7 @@ export default {
 
         async saveHistory(success, memoryTime, recallTime) {
             try {
-                var result = Math.round(success * (1 / (memoryTime + 1)) * (1 / (recallTime + 1)) * 1000 * this.size);
+                var result = Math.round(success * (1 / (memoryTime + 1)) * (1 / (recallTime + 1)) * 1000 * this.dynaSize);
                 const gameHistory = {
                     gameType: 'DiscoverNewContent',
                     score: result,
@@ -226,6 +244,22 @@ export default {
             } catch (error) {
                 console.error('保存游戏历史失败:', error);
                 alert('保存失败：' + (error.response?.data?.message || error.message));
+            }
+        },
+
+        nextLevel() {
+            this.resetGame();
+            
+            if (this.level < 6) {
+                this.level++;
+                this.$router.push({
+                    path: '/discoverContent',
+                    query: {
+                        level: this.level
+                    }
+                })
+            } else {
+                alert("已经是最高难度了！");
             }
         },
     }

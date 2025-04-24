@@ -86,6 +86,8 @@ export default {
         } else {
           console.log("密码正确");
           localStorage.setItem('token', response.data);
+          console.log("你的username是："+this.username);
+          localStorage.setItem('username', this.username); // 存储用户名
           this.$router.push('/home');
         }
 

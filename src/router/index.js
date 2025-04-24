@@ -9,6 +9,7 @@ import RecallOldLocationView from '@/views/gameviews/RecallOldLocationView.vue'
 import RecallOldContentView from '@/views/gameviews/RecallOldContentView.vue'
 import DiscoverNewLocationView from '@/views/gameviews/DiscoverNewLocationView.vue'
 import DiscoverNewContentView from '@/views/gameviews/DiscoverNewContentView.vue'
+import LeaderboardView from '@/views/LeaderBoardView.vue'
 
 
 Vue.use(VueRouter)
@@ -37,7 +38,7 @@ const routes = [
     path: '/recalllocation',
     name: 'recalllocation',
     component: RecallOldLocationView,
-    props: route => ({ size: Number(route.query.size) })
+    props: route => ({ level: Number(route.query.level) })
   },
   {
     path: '/recallcontent',
@@ -54,7 +55,7 @@ const routes = [
     path: '/discovercontent',
     name: 'discovercontent',
     component: DiscoverNewContentView,
-    props: route => ({ size: Number(route.query.size) })
+    props: route => ({ level: Number(route.query.level) })
   },
   {
     path: '/history',
@@ -65,6 +66,11 @@ const routes = [
     path: '/change-password',
     name: 'change-password',
     component: ChangePasswordView
+  },
+  {
+    path: '/leaderboard',
+    name: 'leaderboard',
+    component: LeaderboardView
   }
 
 ]
@@ -86,11 +92,23 @@ router.beforeEach((to, from, next) => {
   // 检查用户是否登录（这里用本地存储模拟）
   const isLoggedIn = !!localStorage.getItem('token') // 示例：登录后存储 token
 
+  // if (to.path === '/recalllocation' || to.path === '/discoverlocation' || to.path === '/discovercontent'&& isLoggedIn) {
+  //   // 如果是内存游戏路由且已登录，检查是否有 size 参数
+  //   const size = Number(to.query.size)
+  //   if (isNaN(size) || size <= 0) {
+  //     // 如果没有有效的 size 参数，重定向到首页
+  //     console.log("from.path: ", from.path)
+  //     console.log("to.path: ", to.path);
+  //     next('/home')
+  //     return
+  //   }
+  // }
+
   if (to.path === '/recalllocation' && isLoggedIn) {
     // 如果是内存游戏路由且已登录，检查是否有 size 参数
-    const size = Number(to.query.size)
-    if (isNaN(size) || size <= 0) {
-      // 如果没有有效的 size 参数，重定向到首页
+    const level = Number(to.query.level)
+    if (isNaN(level) || level <= 0) {
+      // 如果没有有效的 level 参数，重定向到首页
       console.log("from.path: ", from.path)
       console.log("to.path: ", to.path);
       next('/home')
