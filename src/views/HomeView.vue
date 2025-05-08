@@ -1,9 +1,11 @@
 <template>
-  <div class="home">
-    <h1></h1>
+  <div class="home"> <!-- :style="{ backgroundImage: `url(${isOnlineMode ? onlineBg : normalBg})` }" -->
+    <h1></h1> <!-- 欢迎来到记忆力训练游戏 -->
     <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
+    <div>
+      <button @click="toggleOnlineMode">{{ modeText }}</button>
+    </div>
     <br>
-    <h1>欢迎来到记忆力训练游戏</h1>
     <br>
     <div>
       <button @click="getLeaderBoard">排行榜</button>
@@ -53,14 +55,52 @@
 </template>
 
 <script>
-import LeaderBoardView from './LeaderBoardView.vue';
-
+// import normalBg from '@/assets/normal-bg.png';
+// import onlineBg from '@/assets/online-bg.png';
 
 export default {
   name: 'HomeView',
+
+  data() {
+    return {
+      // normalBg,
+      // onlineBg,
+    };
+  },
+
+  computed: {
+    isOnlineMode() { return this.$store.state.isOnlineMode; },
+    modeText() {
+      return this.isOnlineMode ? '联机模式' : '单机模式'; // 根据模式动态返回文字
+    }
+  },
+
   methods: {
     playRecallOldLocationGame(level) {
-      // 通过路由跳转到 MemoryView，并传递 level 参数
+      let destination = {
+        path: '/recalllocation',
+        level: level
+      }
+
+      if (this.isOnlineMode) {
+        console.log("当前是联机模式，即将跳转到匹配页面");
+
+        console.log("destination.path：" + destination.path);
+        console.log("destination.level：" + destination.level);
+
+        this.$store.commit('setDestination', destination);
+
+        console.log("state.destination.level: " + this.$store.state.destination.level);
+        console.log("state.destination.path: " + this.$store.state.destination.path);
+
+
+        this.$router.push({
+          path: '/matchview',
+        });
+
+        return;
+      }
+
       this.$router.push({
         path: '/recalllocation',
         query: { level: level } // 使用 query 参数传递 level
@@ -68,32 +108,112 @@ export default {
     },
 
     playRecallOldContentGame() {
-      this.$router.push('/recallcontent');
+      let destination = {
+        path: '/recallcontent',
+        level: null
+      }
+
+      if (this.isOnlineMode) {
+        console.log("当前是联机模式，即将跳转到匹配页面");
+
+        console.log("destination.path：" + destination.path);
+        console.log("destination.level：" + destination.level);
+
+        this.$store.commit('setDestination', destination);
+
+        console.log("state.destination.level: " + this.$store.state.destination.level);
+        console.log("state.destination.path: " + this.$store.state.destination.path);
+
+        this.$router.push({
+          path: '/matchview',
+        });
+
+        return;
+      }
+
+      this.$router.push({
+        path: '/recallcontent',
+        query: {}
+      });
     },
 
     playDiscoverNewLocationGame(size) {
+      let destination = {
+        path: '/discoverlocation',
+        level: size
+      }
+
+      if (this.isOnlineMode) {
+        console.log("当前是联机模式，即将跳转到匹配页面");
+
+        console.log("destination.path：" + destination.path);
+        console.log("destination.level：" + destination.level);
+
+        this.$store.commit('setDestination', destination);
+
+        console.log("state.destination.level: " + this.$store.state.destination.level);
+        console.log("state.destination.path: " + this.$store.state.destination.path);
+
+        this.$router.push({
+          path: '/matchview',
+        });
+
+        return;
+      }
+
       this.$router.push({
         path: '/discoverlocation',
-        query: { size: size } 
+        query: { size: size }
       });
     },
 
     playDiscoverNewContentGame(level) {
+      let destination = {
+        path: '/discovercontent',
+        level: level
+      }
+
+      if (this.isOnlineMode) {
+        console.log("当前是联机模式，即将跳转到匹配页面");
+
+        console.log("destination.path：" + destination.path);
+        console.log("destination.level：" + destination.level);
+
+        this.$store.commit('setDestination', destination);
+
+        console.log("state.destination.level: " + this.$store.state.destination.level);
+        console.log("state.destination.path: " + this.$store.state.destination.path);
+
+        this.$router.push({
+          path: '/matchview',
+        });
+
+        return;
+      }
+
       // 通过路由跳转到 MemoryView，并传递 size 参数
       this.$router.push({
         path: '/discovercontent',
         query: { level: level } // 使用 query 参数传递 size
       });
     },
-    
+
     confirmLogout() {
       if (confirm('确认要退出登录吗？')) {
         localStorage.removeItem('token');
         this.$router.push('/login');
       }
     },
-    getLeaderBoard(){
+
+    getLeaderBoard() {
       this.$router.push('/leaderboard');
+    },
+
+    // 切换游戏模式
+    toggleOnlineMode() {
+      console.log("toggleOnlineMode方法被调用");
+      this.$store.commit('setOnlineMode', !this.isOnlineMode);
+      console.log("联机模式: " + this.isOnlineMode);
     }
   }
 }
@@ -102,10 +222,14 @@ export default {
 <style scoped>
 .difficulty-options {
   margin-top: 20px;
-  display: flex; /* 使用 Flexbox 布局 */
-  justify-content: center; /* 居中对齐 */
-  gap: 20px; /* 按钮之间的间距，调整此值以控制空格大小 */
+  display: flex;
+  /* 使用 Flexbox 布局 */
+  justify-content: center;
+  /* 居中对齐 */
+  gap: 20px;
+  /* 按钮之间的间距，调整此值以控制空格大小 */
 }
+
 .difficulty-options button {
   padding: 3px 6px;
   font-size: 16px;
@@ -131,5 +255,19 @@ export default {
 
 .user-management button:hover {
   background-color: #5a6268;
+}
+
+.home {
+  min-height: 100vh;
+  /* 确保容器高度占满视口 */
+  background-size: cover;
+  /* 图片覆盖整个容器 */
+  /* background-position: center; 图片居中 */
+  background-repeat: no-repeat;
+  /* 防止重复 */
+  /* background-image: url('~@/assets/normal-bg.png'); */
+  /* 默认背景 */
+  transition: background-image 0.3s ease;
+  /* 平滑过渡 */
 }
 </style>

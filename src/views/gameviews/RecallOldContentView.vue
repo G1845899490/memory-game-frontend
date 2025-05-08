@@ -130,6 +130,11 @@ export default {
       } else {
         // 如果回答错误，保存游戏记录
         this.saveGameHistory();
+        if (this.$store.state.isOnlineMode == true) {
+          this.$router.push({
+            path: '/resultview',
+          })
+        }
       }
     },
 
@@ -166,16 +171,20 @@ export default {
         // 减1是因为失败时当前数字串是记忆失败的那一个
         const finalLevel = this.currentLevel - 1;
         const finalDigits = this.numberString.length - 1;
+        let result = finalDigits * 10 >= 30 ? finalDigits * 10 : 0;
+        this.$store.commit('setMyScore', result);
 
         const gameHistory = {
           gameType: 'RecallOldContent',
-          score: finalDigits * 10 >= 30 ? finalDigits * 10 : 0, // 每位数字10分
+          score: result, // 每位数字10分
           gameData: JSON.stringify([
             { success: 0 }, // 最终都是因为失败结束
             { finalLevel: finalLevel },
             { digitCount: finalDigits }
           ]),
-          playedAt: new Date().toISOString()
+          playedAt: new Date().toISOString(),
+          roomId: this.$store.state.isOnlineMode == true ? this.$store.state.roomId : null,
+
         };
 
         const config = {

@@ -10,6 +10,8 @@ import RecallOldContentView from '@/views/gameviews/RecallOldContentView.vue'
 import DiscoverNewLocationView from '@/views/gameviews/DiscoverNewLocationView.vue'
 import DiscoverNewContentView from '@/views/gameviews/DiscoverNewContentView.vue'
 import LeaderboardView from '@/views/LeaderBoardView.vue'
+import MatchView from '@/views/gameviews/MatchView.vue'
+import ResultView from '@/views/gameviews/ResultView.vue'
 
 
 Vue.use(VueRouter)
@@ -71,8 +73,19 @@ const routes = [
     path: '/leaderboard',
     name: 'leaderboard',
     component: LeaderboardView
-  }
+  },
 
+  {
+    path: '/matchview',
+    name: 'matchview',
+    component: MatchView
+  },
+
+  {
+    path: '/resultview',
+    name: 'resultview',
+    component: ResultView
+  }
 ]
 
 const router = new VueRouter({
@@ -104,17 +117,17 @@ router.beforeEach((to, from, next) => {
   //   }
   // }
 
-  if (to.path === '/recalllocation' && isLoggedIn) {
-    // 如果是内存游戏路由且已登录，检查是否有 size 参数
-    const level = Number(to.query.level)
-    if (isNaN(level) || level <= 0) {
-      // 如果没有有效的 level 参数，重定向到首页
-      console.log("from.path: ", from.path)
-      console.log("to.path: ", to.path);
-      next('/home')
-      return
-    }
-  }
+  // if (to.path === '/recalllocation' && isLoggedIn) {
+  //   // 如果是内存游戏路由且已登录，检查是否有 size 参数
+  //   const level = Number(to.query.level)
+  //   if (isNaN(level) || level <= 0) {
+  //     // 如果没有有效的 level 参数，重定向到首页
+  //     console.log("from.path: ", from.path)
+  //     console.log("to.path: ", to.path);
+  //     next('/home')
+  //     return
+  //   }
+  // }
 
   if (isPublicRoute) {
     // 如果是公开路由，直接放行

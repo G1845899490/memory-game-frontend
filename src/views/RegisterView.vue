@@ -23,8 +23,7 @@
     <div class="button-group">
       <button @click="register" :disabled=false
       :class="{ 'disabled-button': !username || !password || usernameChecking ||(usernameChecked && usernameExists) }">注册</button>
-      <button @click="$router.push('/login')">去登录</button>
-      <button @click="m1">测试</button>
+      <button @click="$router.push('/login')">登录</button>
     </div>
   </div>
 </template>
@@ -91,12 +90,7 @@ export default {
       } catch (error) {
         console.log("注册失败");
       }
-    },
-
-    m1() {
-      console.log("测试按钮被点击了！");
-      // 这里可以添加你想要执行的代码
-    },
+    }
   }
 };
 </script>
