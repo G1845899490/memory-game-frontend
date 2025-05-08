@@ -42,6 +42,7 @@
 <script>
 export default {
     name: 'RecallOldLocationView',
+
     props: {
         level: {
             type: Number,
@@ -49,6 +50,7 @@ export default {
             validator: value => Number.isInteger(value) && value > 0 // 确保是正整数
         }
     },
+
     data() {
         return {
             // data 中的this 并不指向 Vue 实例本身，而是指向当前 data 对象。直接调用 methods 中的方法（如 this.generateRandomContents）会导致错误
@@ -80,7 +82,7 @@ export default {
         },
 
         dynaSize() {
-            console.log("level: " + this.level); 
+            console.log("level: " + this.level);
             if (this.level === 1) this.size = 4;
             if (this.level === 2) this.size = 6;
             if (this.level === 3) this.size = 9;
@@ -104,14 +106,6 @@ export default {
                 this.countDownTimer = null;
             }
 
-            // console.log("level: " + this.level); 
-            
-            // if (this.level === 1) this.size = 4;
-            // if (this.level === 2) this.size = 6;
-            // if (this.level === 3) this.size = 9;
-            // if (this.level === 4) this.size = 12;
-            // if (this.level === 5) this.size = 16;
-
             this.memoryCountDown = 2;
             this.recallCountDown = 2;
             this.recallTime = 0;
@@ -124,7 +118,7 @@ export default {
                 content: element,
                 isFront: false // 默认卡牌背面朝上
             }));
-            this.targetCardIndex = Math.floor(Math.random() * this.size); // 注意范围别超了
+            this.targetCardIndex = Math.floor(Math.random() * this.dynaSize); // 注意范围别超了
             this.question = '找出卡牌 ' + this.cards[this.targetCardIndex].content;
             console.log("targetCardIndex: " + this.targetCardIndex); // 暴露答案
         },
@@ -172,6 +166,12 @@ export default {
                     this.isRecalling = false;
                     this.isEnding = true;
 
+                    if (this.$store.state.isOnlineMode == true) {
+                        this.$router.push({
+                            path: '/resultview',
+                        })
+                    }
+
                     clearInterval(this.countDownTimer);
                     this.countDownTimer = null;
                 }
@@ -197,6 +197,13 @@ export default {
                 this.saveHistory(1, this.reverseCount, this.recallTime);
                 this.isRecalling = false;
                 this.isEnding = true;
+
+                if (this.$store.state.isOnlineMode == true) {
+                    this.$router.push({
+                        path: '/resultview',
+                    })
+                }
+
             }
         },
         // 处理卡牌点击事件
@@ -227,6 +234,10 @@ export default {
         },
 
         goHome() {
+            // 联机模式下游戏中返回首页，保存一个0分的游戏记录和roomId，使对方看到
+            if (this.$store.state.isOnlineMode == true) {
+                this.saveHistory(0, this.reverseCount, this.recallTime);
+            }
             this.initGame();
             this.isPreStarting = false;
             this.$router.push({
@@ -237,12 +248,16 @@ export default {
         async saveHistory(success, reverseCount, recallTime) {
             try {
                 // 构造游戏历史数据
-                var result = Math.round(success * (1 / reverseCount) * (1 / (recallTime + 1)) * 25 * this.size);
+                var result = success ? Math.round(success * (1 / reverseCount) * (1 / (recallTime + 1)) * 25 * this.size) : 0;
+                // 保存result到vuex
+                this.$store.commit('setMyScore', result);
+
                 const gameHistory = {
                     gameType: 'RecallOldLocation',
                     score: result,
                     gameData: JSON.stringify([{ 'success': Number(success) }, { 'reverseCount': Number(reverseCount) }, { 'recallTime': Number(recallTime) }]),
-                    playedAt: new Date().toISOString()
+                    playedAt: new Date().toISOString(),
+                    roomId: this.$store.state.isOnlineMode == true ? this.$store.state.roomId : null,
                 };
 
                 const config = {
@@ -255,6 +270,7 @@ export default {
                 const response = await this.$axios.post('/api/game/history', gameHistory, config);
 
                 console.log('游戏历史保存成功:', response.data);
+
             } catch (error) {
                 console.error('保存游戏历史失败:', error);
                 alert('保存失败：' + (error.response?.data?.message || error.message));

@@ -276,10 +276,18 @@ export default {
       this.isEnding = true;
 
       this.saveGameHistory();
+      
+      if (this.$store.state.isOnlineMode == true) {
+        this.$router.push({
+          path: '/resultview',
+        })
+      }
     },
 
     async saveGameHistory() {
       try {
+        this.$store.commit('setMyScore', this.score);
+
         const gameHistory = {
           gameType: 'DiscoverNewLocation',
           score: this.score,
@@ -288,7 +296,9 @@ export default {
             { foundCards: this.isSuccess ? this.contents.length : this.indexArrPointer - 1 },
             { size: this.size }
           ]),
-          playedAt: new Date().toISOString()
+          playedAt: new Date().toISOString(),
+          roomId: this.$store.state.isOnlineMode == true ? this.$store.state.roomId : null,
+
         };
 
         const response = await this.$axios.post('/api/game/history', gameHistory, {

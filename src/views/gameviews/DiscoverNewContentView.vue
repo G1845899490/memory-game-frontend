@@ -172,6 +172,12 @@ export default {
                     this.saveHistory(this.success, this.memoryTime, this.recallTime);
                     alert("时间到！你没有找到新出现的图片！");
                     this.startEnding();
+
+                    if (this.$store.state.isOnlineMode == true) {
+                        this.$router.push({
+                            path: '/resultview',
+                        })
+                    }
                 }
             }, 1000);
         },
@@ -205,10 +211,22 @@ export default {
                     this.success = 1;
                     this.saveHistory(this.success, this.memoryTime, this.recallTime);
                     alert("Nice！你找到了新出现的图片！");
+
+                    if (this.$store.state.isOnlineMode == true) {
+                        this.$router.push({
+                            path: '/resultview',
+                        })
+                    }
                 } else {
                     this.startEnding();
                     this.saveHistory(this.success, this.memoryTime, this.recallTime);
                     alert("Oops！这不是新出现的图片！");
+
+                    if (this.$store.state.isOnlineMode == true) {
+                        this.$router.push({
+                            path: '/resultview',
+                        })
+                    }
                 }
             }
         },
@@ -224,11 +242,14 @@ export default {
         async saveHistory(success, memoryTime, recallTime) {
             try {
                 var result = Math.round(success * (1 / (memoryTime + 1)) * (1 / (recallTime + 1)) * 1000 * this.dynaSize);
+                this.$store.commit('setMyScore', result);
+
                 const gameHistory = {
                     gameType: 'DiscoverNewContent',
                     score: result,
                     gameData: JSON.stringify([{ 'success': Number(success) }, { 'memoryTime': Number(memoryTime) }, { 'recallTime': Number(recallTime) }]),
-                    playedAt: new Date().toISOString()
+                    playedAt: new Date().toISOString(),
+                    roomId: this.$store.state.isOnlineMode == true ? this.$store.state.roomId : null,
                 };
 
                 const config = {
@@ -249,7 +270,7 @@ export default {
 
         nextLevel() {
             this.resetGame();
-            
+
             if (this.level < 6) {
                 this.level++;
                 this.$router.push({
