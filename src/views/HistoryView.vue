@@ -1,67 +1,68 @@
 <template>
-  <div>
-    <div class="header">
-      <h2>历史记录</h2>
+  <div class="page-container">
+    <div class="page-header">
+      <h2 class="page-title">我的游戏历史</h2>
+      <button class="back-button" @click="$router.push('/home')">返回首页</button>
     </div>
 
     <div class="filter-sort-container">
-      <div class="filter-group1">
-        <label>类型：</label>
-        <select v-model="selectedGameType">
-          <option value="">全部</option>
-          <option v-for="type in gameTypes" :key="type" :value="type">{{ type }}</option>
-        </select>
+      <div class="filter-group">
+        <div class="filter-item">
+          <label class="form-label">游戏类型：</label>
+          <select v-model="selectedGameType" class="form-control">
+            <option value="">全部</option>
+            <option v-for="type in gameTypes" :key="type" :value="type">{{ type }}</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label class="form-label">游戏状态：</label>
+          <select v-model.number="selectSuccess" class="form-control">
+            <option value="-1">全部</option>
+            <option value="0">失败</option>
+            <option value="1">成功</option>
+          </select>
+        </div>
+
+        <div class="filter-item">
+          <label class="form-label">排序方式：</label>
+          <select v-model="sortField" class="form-control">
+            <option value="score">得分</option>
+            <option value="playedAt">日期</option>
+          </select>
+          <select v-model="sortOrder" class="form-control">
+            <option value="asc">升序</option>
+            <option value="desc">降序</option>
+          </select>
+        </div>
       </div>
-
-      <!-- <select> 元素会将 value 作为字符串传递，因此 v-model="selectSuccess" 的值可能是 "-1"、"0" 或 "1"。 -->
-      <div class="filter-group2">
-        <label>是否成功：</label>
-        <select v-model.number="selectSuccess">
-          <option value="-1">全部</option>
-          <option value="0">失败</option>
-          <option value="1">成功</option>
-        </select>
-      </div>
-
-      <div class="sort-group">
-        <label>排序：</label>
-        <select v-model="sortField">
-          <option value="score">得分</option>
-          <option value="playedAt">日期</option>
-        </select>
-        <select v-model="sortOrder">
-          <option value="asc">升序</option>
-          <option value="desc">降序</option>
-        </select>
-      </div>
-
-      <button class="back-button" @click="$router.push('/home')">返回首页</button>
-
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th v-for="(header, index) in dynamicHeaders" :key="index">{{ header }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(record, index) in paginatedHistory" :key="record.id">
-          <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
-          <td>{{ record.gameType }}</td>
-          <td>{{ getGameData(record.gameData).prop1 }}</td>
-          <td>{{ record.score }}</td>
-          <td>{{ getGameData(record.gameData).prop2 }}</td>
-          <td>{{ getGameData(record.gameData).prop3 }}</td>
-          <td>{{ formatDate(record.playedAt) }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th v-for="(header, index) in dynamicHeaders" :key="index">{{ header }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(record, index) in paginatedHistory" :key="record.id">
+            <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
+            <td>{{ record.gameType }}</td>
+            <td>{{ getGameData(record.gameData).prop1 }}</td>
+            <td>{{ record.score }}</td>
+            <td>{{ getGameData(record.gameData).prop2 }}</td>
+            <td>{{ getGameData(record.gameData).prop3 }}</td>
+            <td>{{ formatDate(record.playedAt) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div class="pagination">
-      <button :disabled="currentPage === 1" @click="currentPage--">上一页</button>
-      <span>第 {{ currentPage }} 页 / 共 {{ totalPages }} 页</span>
-      <button :disabled="currentPage === totalPages" @click="currentPage++">下一页</button>
+      <button class="pagination-btn" :disabled="currentPage === 1" @click="currentPage--">上一页</button>
+      <span class="pagination-info">第 {{ currentPage }} 页 / 共 {{ totalPages }} 页</span>
+      <button class="pagination-btn" :disabled="currentPage === totalPages" @click="currentPage++">下一页</button>
     </div>
   </div>
 </template>
@@ -288,83 +289,171 @@ export default {
 };
 </script>
 <style scoped>
-table {
-  width: 60%;
-  margin: 20px auto;
-  border-collapse: collapse;
+.page-container {
+  max-width: 1200px; /* 设置页面容器的最大宽度，确保在大屏幕上内容不会过宽 */
+  margin: 0 auto; /* 水平居中显示 */
+  padding: 15px; /* 设置内边距，使内容与容器边缘保持适当距离 */
 }
 
-th,
-td {
-  border: 1px solid black;
-  padding: 8px;
-  text-align: center;
-  font-size: 14px;
+.page-header {
+  display: flex; /* 使用弹性布局 */
+  justify-content: space-between; /* 标题和按钮分别靠左和靠右对齐 */
+  align-items: center; /* 垂直居中对齐 */
+  margin-bottom: 15px; /* 与下方内容保持间距 */
 }
 
-th {
-  background-color: #f5f5f5;
-  font-weight: bold;
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.pagination button {
-  padding: 8px 16px;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  cursor: pointer;
-}
-
-.pagination button:disabled {
-  background-color: #f5f5f5;
-  cursor: not-allowed;
-}
-
-.pagination span {
-  font-size: 14px;
-  color: #666;
-}
-
-.filter-sort-container {
-  margin: 20px auto;
-  width: 60%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.filter-group,
-.sort-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: nowrap;
-}
-
-.sort-group select,
-.filter-group select {
-  min-width: 80px;
+.page-title {
+  font-size: 24px; /* 设置标题文字大小 */
+  color: #333; /* 设置标题文字颜色为深灰色 */
+  margin: 0; /* 移除默认外边距 */
 }
 
 .back-button {
-  padding: 8px 16px;
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
+  padding: 8px 20px; /* 设置按钮内边距，上下8px，左右20px */
+  background-color: #6c757d; /* 设置按钮背景色为灰色 */
+  color: white; /* 设置按钮文字颜色为白色 */
+  border: none; /* 移除按钮边框 */
+  border-radius: 6px; /* 设置按钮圆角 */
+  cursor: pointer; /* 鼠标悬停时显示手型光标 */
+  font-size: 14px; /* 设置按钮文字大小 */
+  transition: all 0.3s ease; /* 添加过渡效果，使交互更流畅 */
 }
 
 .back-button:hover {
-  background-color: #5a6268;
+  background-color: #5a6268; /* 鼠标悬停时按钮背景色变深 */
+  transform: translateY(-2px); /* 鼠标悬停时按钮轻微上浮 */
+}
+
+.filter-sort-container {
+  background-color: #f8f9fa; /* 设置筛选区域背景色为浅灰色 */
+  padding: 12px; /* 设置内边距 */
+  border-radius: 8px; /* 设置圆角 */
+  margin-bottom: 15px; /* 与下方内容保持间距 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 添加轻微阴影效果 */
+}
+
+.filter-group {
+  display: flex; /* 使用弹性布局 */
+  flex-wrap: wrap; /* 允许元素换行 */
+  gap: 15px; /* 设置元素之间的间距 */
+  justify-content: flex-start; /* 元素靠左对齐 */
+}
+
+.filter-item {
+  display: flex; /* 使用弹性布局 */
+  align-items: center; /* 垂直居中对齐 */
+  gap: 10px; /* 设置元素之间的间距 */
+}
+
+.form-label {
+  font-size: 14px; /* 设置标签文字大小 */
+  color: #495057; /* 设置标签文字颜色 */
+  white-space: nowrap; /* 防止标签文字换行 */
+}
+
+.form-control {
+  padding: 6px 12px; /* 设置输入框内边距 */
+  border: 1px solid #ced4da; /* 设置边框 */
+  border-radius: 4px; /* 设置圆角 */
+  font-size: 14px; /* 设置文字大小 */
+  color: #495057; /* 设置文字颜色 */
+  background-color: #fff; /* 设置背景色为白色 */
+  min-width: 120px; /* 设置最小宽度 */
+}
+
+.table-container {
+  background-color: #fff; /* 设置表格容器背景色为白色 */
+  border-radius: 8px; /* 设置圆角 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 添加轻微阴影效果 */
+  overflow-x: auto; /* 允许横向滚动 */
+  margin-bottom: 15px; /* 与下方内容保持间距 */
+}
+
+table {
+  width: 100%; /* 表格宽度占满容器 */
+  border-collapse: collapse; /* 合并表格边框 */
+  font-size: 15px; /* 设置表格文字大小 */
+}
+
+th, td {
+  padding: 10px 15px; /* 设置单元格内边距 */
+  text-align: center; /* 文字居中对齐 */
+  border-bottom: 1px solid #dee2e6; /* 设置底部边框 */
+  line-height: 1.7; /* 设置行高，使文字更加舒适 */
+}
+
+th {
+  background-color: #f8f9fa; /* 设置表头背景色 */
+  font-weight: 600; /* 设置表头文字粗细 */
+  color: #495057; /* 设置表头文字颜色 */
+  font-size: 15px; /* 设置表头文字大小 */
+}
+
+tbody tr:hover {
+  background-color: #f8f9fa; /* 鼠标悬停时行背景色变化 */
+}
+
+.pagination {
+  display: flex; /* 使用弹性布局 */
+  justify-content: center; /* 水平居中对齐 */
+  align-items: center; /* 垂直居中对齐 */
+  gap: 15px; /* 设置元素之间的间距 */
+  margin-bottom: 10px; /* 与底部保持间距 */
+}
+
+.pagination-btn {
+  padding: 8px 20px; /* 设置按钮内边距 */
+  border: 1px solid #dee2e6; /* 设置边框 */
+  background-color: #fff; /* 设置背景色为白色 */
+  color: #495057; /* 设置文字颜色 */
+  border-radius: 4px; /* 设置圆角 */
+  cursor: pointer; /* 鼠标悬停时显示手型光标 */
+  transition: all 0.3s ease; /* 添加过渡效果 */
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #f8f9fa; /* 鼠标悬停时背景色变化 */
+  border-color: #ced4da; /* 鼠标悬停时边框颜色变化 */
+}
+
+.pagination-btn:disabled {
+  background-color: #f8f9fa; /* 禁用状态下的背景色 */
+  color: #adb5bd; /* 禁用状态下的文字颜色 */
+  cursor: not-allowed; /* 禁用状态下的鼠标样式 */
+}
+
+.pagination-info {
+  font-size: 14px; /* 设置页码信息文字大小 */
+  color: #6c757d; /* 设置页码信息文字颜色 */
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 10px; /* 在小屏幕上减小内边距 */
+  }
+
+  .filter-group {
+    flex-direction: column; /* 在小屏幕上改为垂直排列 */
+    gap: 10px; /* 减小元素间距 */
+  }
+
+  .filter-item {
+    width: 100%; /* 在小屏幕上占满宽度 */
+  }
+
+  .form-control {
+    width: 100%; /* 在小屏幕上占满宽度 */
+  }
+
+  .table-container {
+    margin: 0 -15px; /* 在小屏幕上移除左右边距 */
+    border-radius: 0; /* 在小屏幕上移除圆角 */
+  }
+
+  th, td {
+    padding: 8px 12px; /* 在小屏幕上减小内边距 */
+    font-size: 14px; /* 在小屏幕上减小字体大小 */
+  }
 }
 </style>
