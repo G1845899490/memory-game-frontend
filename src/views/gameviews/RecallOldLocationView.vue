@@ -234,10 +234,6 @@ export default {
         },
 
         goHome() {
-            // 联机模式下游戏中返回首页，保存一个0分的游戏记录和roomId，使对方看到
-            if (this.$store.state.isOnlineMode == true) {
-                this.saveHistory(0, this.reverseCount, this.recallTime);
-            }
             this.initGame();
             this.isPreStarting = false;
             this.$router.push({
@@ -329,9 +325,42 @@ export default {
 #controllerBanner {
     text-align: center;
     padding: 15px;
+    display: flex; /* 使用弹性布局 */
+    flex-direction: row; /* 水平排列 */
+    justify-content: center; /* 水平居中 */
+    gap: 15px; /* 设置按钮之间的间距 */
 }
 
 #controllerBanner button {
-    margin: 15px;
+  padding: 10px 20px; /* 设置按钮内边距 */
+  font-size: 15px; /* 设置文字大小 */
+  border: none; /* 移除边框 */
+  border-radius: 6px; /* 设置圆角 */
+  background-color: #e9ecef; /* 设置默认背景色为浅灰色 */
+  color: #495057; /* 设置文字颜色为深灰色 */
+  cursor: pointer; /* 设置鼠标样式 */
+  transition: all 0.3s ease; /* 添加过渡效果 */
+  width: 120px; /* 统一按钮宽度 */
+  margin: 0; /* 移除默认外边距 */
 }
+
+#controllerBanner button:hover {
+  background-color: #dee2e6; /* 鼠标悬停时的背景色 */
+  transform: translateY(-2px); /* 悬停时上移效果 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* 添加轻微阴影 */
+}
+
+#controllerBanner button:active {
+  transform: translateY(0); /* 点击时恢复位置 */
+  box-shadow: none; /* 移除阴影 */
+}
+
+#controllerBanner button:disabled {
+  background-color: #f8f9fa; /* 禁用状态的背景色 */
+  color: #adb5bd; /* 禁用状态的文字颜色 */
+  cursor: not-allowed; /* 禁用状态的鼠标样式 */
+  transform: none; /* 移除变换效果 */
+  box-shadow: none; /* 移除阴影 */
+}
+
 </style>

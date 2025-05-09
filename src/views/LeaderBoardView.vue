@@ -1,16 +1,21 @@
 <template>
   <div class="leaderboard-container">
     <!-- 游戏类型选择 -->
-    <div class="game-type-selector">
-      <label>选择游戏类型：</label>
-      <select v-model="selectedGameType" @change="fetchLeaderboard">
-        <option value="DiscoverNewLocation">发现新位置</option>
-        <option value="DiscoverNewContent">发现新内容</option>
-        <option value="RecallOldLocation">回忆旧位置</option>
-        <option value="RecallOldContent">回忆旧内容</option>
-      </select>
-      <span>&nbsp;</span>
-      <button @click="goHome">返回首页</button>
+    <div class="filter-sort-container">
+      <div class="filter-group">
+        <div class="filter-item">
+          <label class="form-label">游戏类型：</label>
+          <select v-model="selectedGameType" @change="fetchLeaderboard" class="form-control">
+            <option value="DiscoverNewLocation">发现新位置</option>
+            <option value="DiscoverNewContent">发现新内容</option>
+            <option value="RecallOldLocation">回忆旧位置</option>
+            <option value="RecallOldContent">回忆旧内容</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <button class="back-button" @click="goHome">返回首页</button>
+        </div>
+      </div>
     </div>
 
     <!-- 排行榜列表 -->
@@ -165,66 +170,174 @@ export default {
   padding-bottom: 100px;
 }
 
-.game-type-selector {
-  margin-bottom: 20px;
+.filter-sort-container {
+  background-color: #f8f9fa; /* 设置筛选区域背景色为浅灰色 */
+  padding: 12px; /* 设置内边距 */
+  border-radius: 8px; /* 设置圆角 */
+  margin-bottom: 20px; /* 与下方内容保持间距 */
+  box-shadow: 0 2px 4px rgba(165, 44, 44, 0.05); /* 添加轻微阴影效果 */
+  max-width: 760px; /* 减小最大宽度，与表格对齐 */
+  margin-left: auto; /* 水平居中 */
+  margin-right: auto; /* 水平居中 */
+}
+
+.filter-group {
+  display: flex; /* 使用弹性布局 */
+  flex-wrap: wrap; /* 允许元素换行 */
+  justify-content: space-between; /* 两端对齐，一个靠左一个靠右 */
+  align-items: center; /* 垂直居中对齐 */
+}
+
+.filter-item {
+  display: flex; /* 使用弹性布局 */
+  align-items: center; /* 垂直居中对齐 */
+  gap: 10px; /* 设置元素之间的间距 */
+}
+
+.form-label {
+  font-size: 14px; /* 设置标签文字大小 */
+  color: #495057; /* 设置标签文字颜色 */
+  white-space: nowrap; /* 防止标签文字换行 */
+}
+
+.form-control {
+  padding: 6px 12px; /* 设置输入框内边距 */
+  border: 1px solid #ced4da; /* 设置边框 */
+  border-radius: 4px; /* 设置圆角 */
+  font-size: 14px; /* 设置文字大小 */
+  color: #495057; /* 设置文字颜色 */
+  background-color: #fff; /* 设置背景色为白色 */
+  min-width: 120px; /* 设置最小宽度 */
 }
 
 .leaderboard-table {
-  max-height: 500px;
-  overflow-y: auto;
+  max-width: 780px; /* 设置最大宽度，与筛选区域对齐 */
+  margin: 0 auto; /* 水平居中 */
+  background-color: #fff; /* 设置背景色为白色 */
+  border-radius: 8px; /* 设置圆角 */
+  box-shadow: 0 2px 4px rgba(165, 44, 44, 0.05); /* 添加轻微阴影效果 */
+  overflow-x: auto; /* 允许横向滚动 */
 }
 
 table {
-  width: 80%;
-  max-width: 800px;
-  margin: 0 auto;
-  border-collapse: collapse;
+  width: 100%; /* 表格宽度占满容器 */
+  border-collapse: collapse; /* 合并表格边框 */
+  font-size: 15px; /* 设置表格文字大小 */
 }
 
-th,
-td {
-  padding: 10px;
-  border: 1px solid #ccc;
-  text-align: center;
+th, td {
+  padding: 12px 15px; /* 设置单元格内边距 */
+  text-align: center; /* 文字居中对齐 */
+  border-bottom: 1px solid #dee2e6; /* 设置底部边框 */
+  line-height: 1.4; /* 设置行高 */
 }
 
-thead {
-  background-color: #f5f5f5;
-  position: sticky;
-  top: 0;
+th {
+  background-color: #f8f9fa; /* 设置表头背景色 */
+  font-weight: 600; /* 设置表头文字粗细 */
+  color: #495057; /* 设置表头文字颜色 */
+  font-size: 15px; /* 设置表头文字大小 */
+}
+
+tbody tr:hover {
+  background-color: #f8f9fa; /* 鼠标悬停时行背景色变化 */
 }
 
 .highlight {
-  background-color: #ffff99;
+  background-color: #e3f2fd; /* 高亮当前用户的行 */
+  font-weight: 500; /* 加粗显示 */
 }
 
 .pagination {
-  margin: 20px 0 30px 0;
-  text-align: center;
-  position: relative;
-  z-index: 1;
+  display: flex; /* 使用弹性布局 */
+  justify-content: center; /* 水平居中对齐 */
+  align-items: center; /* 垂直居中对齐 */
+  gap: 15px; /* 减小元素之间的间距 */
+  margin: 15px auto; /* 减小上下外边距 */
+  max-width: 760px; /* 与表格对齐 */
+}
+
+.pagination button {
+  padding: 4px 10px; /* 减小按钮内边距 */
+  border: 1px solid #dee2e6; /* 设置边框 */
+  background-color: #fff; /* 设置背景色为白色 */
+  color: #495057; /* 设置文字颜色 */
+  border-radius: 4px; /* 设置圆角 */
+  cursor: pointer; /* 鼠标悬停时显示手型光标 */
+  font-size: 13px; /* 减小文字大小 */
+  transition: all 0.3s ease; /* 添加过渡效果 */
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #f8f9fa; /* 鼠标悬停时背景色变化 */
+  border-color: #ced4da; /* 鼠标悬停时边框颜色变化 */
+}
+
+.pagination button:disabled {
+  background-color: #f8f9fa; /* 禁用状态下的背景色 */
+  color: #adb5bd; /* 禁用状态下的文字颜色 */
+  cursor: not-allowed; /* 禁用状态下的鼠标样式 */
+}
+
+.pagination span {
+  font-size: 13px; /* 减小页码信息文字大小 */
+  color: #6c757d; /* 设置页码信息文字颜色 */
 }
 
 .my-rank {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: #fff;
-  padding: 15px 10px;
-  border-top: 1px solid #ccc;
-  text-align: center;
-  z-index: 10;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  position: fixed; /* 固定定位 */
+  bottom: 0; /* 固定在底部 */
+  left: 0; /* 左对齐 */
+  width: 100%; /* 宽度占满 */
+  background-color: #fff; /* 设置背景色为白色 */
+  padding: 12px 0; /* 设置内边距 */
+  border-top: 1px solid #dee2e6; /* 上边框 */
+  text-align: center; /* 文字居中 */
+  z-index: 10; /* 确保显示在最上层 */
+  box-shadow: 0 -2px 4px rgba(165, 44, 44, 0.05); /* 添加上方阴影 */
 }
 
 .my-rank h3 {
-  margin: 0 0 5px 0;
-  font-size: 16px;
+  font-size: 16px; /* 设置标题文字大小 */
+  color: #333; /* 设置标题文字颜色 */
+  margin: 0 0 8px 0; /* 设置标题下边距 */
+  font-weight: 600; /* 设置文字粗细 */
 }
 
 .my-rank p {
-  margin: 0;
-  font-size: 14px;
+  margin: 4px 0; /* 设置段落间距 */
+  font-size: 14px; /* 设置文字大小 */
+  color: #495057; /* 设置文字颜色 */
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .my-rank {
+    padding: 10px 0; /* 在小屏幕上减小内边距 */
+  }
+
+  .my-rank h3 {
+    font-size: 15px; /* 在小屏幕上减小标题文字大小 */
+  }
+
+  .my-rank p {
+    font-size: 13px; /* 在小屏幕上减小文字大小 */
+  }
+}
+
+.back-button {
+  padding: 6px 20px; /* 设置按钮内边距 */
+  background-color: #6c757d; /* 设置按钮背景色为灰色 */
+  color: white; /* 设置按钮文字颜色为白色 */
+  border: none; /* 移除按钮边框 */
+  border-radius: 4px; /* 设置按钮圆角 */
+  cursor: pointer; /* 鼠标悬停时显示手型光标 */
+  font-size: 14px; /* 设置按钮文字大小 */
+  transition: all 0.3s ease; /* 添加过渡效果 */
+}
+
+.back-button:hover {
+  background-color: #5a6268; /* 鼠标悬停时按钮背景色变深 */
+  transform: translateY(-2px); /* 鼠标悬停时按钮轻微上浮 */
 }
 </style>

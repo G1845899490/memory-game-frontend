@@ -1,45 +1,47 @@
 <template>
   <div class="game-container">
-    <!-- 信息区 -->
-    <div class="game-stage">
-      <h2 v-if="isPreStarting" class="game-description">在{{ remainingClicks }}次内点击新出现的扑克牌</h2>
+    <div class="game-content">
+      <!-- 信息区 -->
+      <div class="game-info-area">
+        <h2 v-if="isPreStarting" class="game-description">找到新扑克牌</h2> <!-- 在{{ remainingClicks }}次内 -->
 
-      <h2 v-if="isPlaying">
-        <span>剩余{{ remainingClicks }}次点击</span>
-        {{ $nbsp }}
-        <span>当前{{ score }}分</span>
-        {{ $nbsp }}
-      </h2>
+        <h2 v-if="isPlaying">
+          <span>剩余{{ remainingClicks }}次点击</span>
+          <!-- {{ $nbsp }}
+          <span>当前{{ score }}分</span>
+          {{ $nbsp }} -->
+        </h2>
 
-      <h2 v-if="isEnding">
-        {{ isSuccess ? '恭喜通关！' : '游戏结束' }}
-        {{ $nbsp }}
-        <span>最终{{ score }}分</span>
-      </h2>
-    </div>
+        <h2 v-if="isEnding">
+          <span>{{ isSuccess ? '恭喜通关！' : '游戏结束' }}</span>
+          <br>
+          <span>分数：{{ score }}</span>
+        </h2>
+      </div>
 
-    <!-- 游戏区 -->
-    <div class="game-stage">
-      <div id="cardsArea" v-bind:style="{ 'grid-template-columns': gridColumns }" style="position: relative;">
-        <!-- 遮罩层 -->
-        <div class="overlay" v-show="isOverlayVisible">
-          <div class="loader"></div> <!-- 转圈加载动画 -->
-        </div>
+      <!-- 游戏区 -->
+      <div class="game-play-area">
+        <div id="cardsArea" v-bind:style="{ 'grid-template-columns': gridColumns }" style="position: relative;">
+          <!-- 遮罩层 -->
+          <div class="overlay" v-show="isOverlayVisible">
+            <div class="loader"></div> <!-- 转圈加载动画 -->
+          </div>
 
-        <div class="card" v-for="(card, index) in dynaMatrix" :key="index" v-on:click="checkClick(index)">
-          <div v-bind:style="{ visibility: matrix[index].isFront ? 'visible' : 'hidden' }">
-            <img :src="matrix[index].card.image" alt="poker card" class="card-image">
+          <div class="card" v-for="(card, index) in dynaMatrix" :key="index" v-on:click="checkClick(index)">
+            <div v-bind:style="{ visibility: matrix[index].isFront ? 'visible' : 'hidden' }">
+              <img :src="matrix[index].card.image" alt="poker card" class="card-image">
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 控制区 -->
-    <div class="game-stage">
-      <button @click="startGame" class="start-button" v-bind:disabled="!isPreStarting">开始游戏</button>
-      <button @click="initGame" class="play-again-button">再玩一局</button>
-      <button v-on:click="nextLevel">下一难度</button>
-      <button @click="$router.push('/home')" class="back-button">返回首页</button>
+      <!-- 控制区 -->
+      <div class="game-control-area">
+        <button @click="startGame" v-bind:disabled="!isPreStarting">开始游戏</button>
+        <button @click="initGame" >再玩一局</button>
+        <button v-on:click="nextLevel" >下一难度</button>
+        <button @click="$router.push('/home')" >返回首页</button>
+      </div>
     </div>
   </div>
 </template>
@@ -331,92 +333,155 @@ export default {
 </script>
 
 <style scoped>
+.game-container {
+  max-width: 1200px; /* 设置最大宽度 */
+  margin: 0 auto; /* 水平居中 */
+  padding: 20px; /* 设置内边距 */
+  min-height: 100vh; /* 占满视口高度 */
+  display: flex; /* 使用弹性布局 */
+  flex-direction: column; /* 垂直方向排列 */
+  align-items: center; /* 水平居中 */
+  padding-top: 0; /* 移除顶部间距 */
+}
+
+.game-content {
+  width: 100%; /* 宽度占满容器 */
+  height: 100vh; /* 高度占满视口 */
+  display: flex; /* 使用弹性布局 */
+  justify-content: space-between; /* 水平均匀分布 */
+  align-items: center; /* 改为垂直居中 */
+  gap: 20px; /* 区域之间的间距 */
+  margin-top: 0px; /* 整体向上移动 */
+}
+
+.game-info-area {
+  width: 200px; /* 设置固定宽度 */
+  margin-bottom: 10px; /* 与下方内容保持间距 */
+  padding: 15px; /* 设置内边距 */
+  margin-top: -50px; /* 减小上部留白 */
+}
+
+.game-play-area {
+  flex: 1; /* 占据剩余空间 */
+  max-width: 800px; /* 设置最大宽度 */
+  margin-bottom: 20px; /* 与下方内容保持间距 */
+  padding: 1px; /* 设置内边距 */
+}
+
+.game-control-area {
+  width: 200px; /* 设置固定宽度 */
+  margin-bottom: 20px; /* 与下方内容保持间距 */
+  padding: 15px; /* 设置内边距 */
+  display: flex; /* 使用弹性布局 */
+  flex-direction: column; /* 垂直排列按钮 */
+  gap: 15px; /* 按钮之间的间距 */
+}
+
+.game-control-area button {
+  padding: 10px 20px; /* 设置按钮内边距 */
+  font-size: 15px; /* 设置文字大小 */
+  border: none; /* 移除边框 */
+  border-radius: 6px; /* 设置圆角 */
+  background-color: #e9ecef; /* 设置默认背景色为浅灰色 */
+  color: #495057; /* 设置文字颜色为深灰色 */
+  cursor: pointer; /* 设置鼠标样式 */
+  transition: all 0.3s ease; /* 添加过渡效果 */
+  width: 140px; /* 统一按钮宽度 */
+}
+
+.game-control-area button:hover {
+  background-color: #dee2e6; /* 鼠标悬停时的背景色 */
+  transform: translateY(-2px); /* 悬停时上移效果 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* 添加轻微阴影 */
+}
+
+.game-control-area button:active {
+  transform: translateY(0); /* 点击时恢复位置 */
+  box-shadow: none; /* 移除阴影 */
+}
+
+.game-control-area button:disabled {
+  background-color: #f8f9fa; /* 禁用状态的背景色 */
+  color: #adb5bd; /* 禁用状态的文字颜色 */
+  cursor: not-allowed; /* 禁用状态的鼠标样式 */
+  transform: none; /* 移除变换效果 */
+  box-shadow: none; /* 移除阴影 */
+}
+
 #cardsArea {
-  display: grid;
-  justify-content: center;
-  gap: 10px;
-  position: relative;
-  /* 确保遮罩的 absolute 定位相对于此容器 */
+  display: grid; /* 使用网格布局 */
+  justify-content: center; /* 水平居中 */
+  gap: 10px; /* 设置网格间距 */
+  position: relative; /* 设置相对定位，作为遮罩层的参考 */
 }
 
 .card {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  /* 填满格子宽度 */
-  height: 105px;
-  border: 1px solid black;
-  background-color: lightgray;
-  overflow: hidden;
-  /* 防止图片溢出 */
+  display: flex; /* 使用弹性布局 */
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  width: 100%; /* 宽度占满格子 */
+  height: 105px; /* 设置固定高度 */
+  border: 1px solid black; /* 设置边框 */
+  background-color: lightgray; /* 设置背景色 */
+  overflow: hidden; /* 防止内容溢出 */
 }
 
 .card-image {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  /* 保持图片比例 */
+  max-width: 100%; /* 最大宽度占满容器 */
+  max-height: 100%; /* 最大高度占满容器 */
+  object-fit: contain; /* 保持图片比例 */
 }
 
 /* 遮罩层样式 */
 .overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #000000;
-  /* 不透明黑色遮罩 */
-  z-index: 10;
-  /* 确保遮罩在卡牌上方 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* 居中加载动画 */
-  animation: fadeOut 1.0s ease forwards;
-  /* 淡出动画 */
+  position: absolute; /* 绝对定位 */
+  top: 0; /* 顶部对齐 */
+  left: 0; /* 左侧对齐 */
+  width: 100%; /* 宽度占满容器 */
+  height: 100%; /* 高度占满容器 */
+  background-color: #000000; /* 设置黑色背景 */
+  z-index: 10; /* 确保遮罩在卡牌上方 */
+  display: flex; /* 使用弹性布局 */
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  animation: fadeOut 1.0s ease forwards; /* 添加淡出动画 */
 }
 
 /* 转圈加载动画 */
 .loader {
-  width: 40px;
-  height: 40px;
-  border: 5px solid #ffffff;
-  /* 白色边框 */
-  border-top: 5px solid #3498db;
-  /* 蓝色顶部边框，突出旋转效果 */
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  /* 持续旋转 */
+  width: 40px; /* 设置宽度 */
+  height: 40px; /* 设置高度 */
+  border: 5px solid #ffffff; /* 设置白色边框 */
+  border-top: 5px solid #3498db; /* 设置蓝色顶部边框 */
+  border-radius: 50%; /* 设置为圆形 */
+  animation: spin 1s linear infinite; /* 添加旋转动画 */
 }
 
 /* 淡出动画 */
 @keyframes fadeOut {
   0% {
-    opacity: 1;
-    /* 开始时完全不透明 */
+    opacity: 1; /* 开始时完全不透明 */
   }
 
   80% {
-    opacity: 1;
-    /* 前 80% 时间（1.2s）保持不透明 */
+    opacity: 1; /* 前80%时间保持不透明 */
   }
 
   100% {
-    opacity: 0;
-    /* 最后 20% 时间（0.3s）快速淡出 */
+    opacity: 0; /* 最后20%时间快速淡出 */
   }
 }
 
 /* 旋转动画 */
 @keyframes spin {
   0% {
-    transform: rotate(0deg);
+    transform: rotate(0deg); /* 开始角度 */
   }
 
   100% {
-    transform: rotate(360deg);
+    transform: rotate(360deg); /* 结束角度 */
   }
 }
+
+
 </style>
