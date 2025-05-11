@@ -75,7 +75,7 @@ export default {
     },
 
     async register() {
-      this.m1();
+      // this.m1();
       console.log("1注册中...");
       try {
         console.log("注册中...");
